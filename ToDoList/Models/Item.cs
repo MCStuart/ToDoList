@@ -10,11 +10,16 @@ namespace ToDoList.Models
     private int _id;
     private DateTime _dueDate;
 
-    public Item (string description, int id = 0, DateTime dueDate)
+    public Item (string description, DateTime dueDate)
     {
       _description = description;
-      _id = id;
       _dueDate = dueDate;
+    }
+    public Item (string description, DateTime dueDate, int id)
+    {
+      _description = description;
+      _dueDate = dueDate;
+      _id = id;
     }
 
     public DateTime GetDueDate()
@@ -22,7 +27,7 @@ namespace ToDoList.Models
       return _dueDate;
     }
 
-    public void SetDueDate()
+    public void SetDueDate(DateTime dueDate)
     {
       _dueDate = dueDate;
     }
@@ -62,14 +67,14 @@ namespace ToDoList.Models
       MySqlConnection conn = DB.Connection();
       conn.Open();
       var cmd = conn.CreateCommand() as MySqlCommand;
-      cmd.CommandText = @"INSERT INTO items (description), (dueDate) VALUES (@ItemDescription), (@ItemDueDate);";
+      cmd.CommandText = @"INSERT INTO items (description, dueDate) VALUES (@ItemDescription, @ItemDueDate);";
       MySqlParameter description = new MySqlParameter();
       description.ParameterName = "@ItemDescription";
       description.Value = this._description;
-      cmd.Parameters.Add(description);
       MySqlParameter dueDate = new MySqlParameter();
       dueDate.ParameterName = "@ItemDueDate";
       dueDate.Value = this._dueDate;
+      cmd.Parameters.Add(description);
       cmd.Parameters.Add(dueDate);
       cmd.ExecuteNonQuery();
       _id = (int) cmd.LastInsertedId;
@@ -92,8 +97,8 @@ namespace ToDoList.Models
       {
         int itemId = rdr.GetInt32(0);
         string itemDescription = rdr.GetString(1);
-        DateTime itemDueDate = rdr.GetDate(2);
-        Item newItem = new Item(itemDescription, itemId, dueDate);
+        DateTime itemDueDate = rdr.GetDateTime(2);
+        Item newItem = new Item(itemDescription, itemDueDate, itemId);
         allItems.Add(newItem);
       }
       conn.Close();
@@ -131,14 +136,13 @@ namespace ToDoList.Models
       var rdr = cmd.ExecuteReader() as MySqlDataReader;
       int itemId = 0;
       string itemDescription = "";
-      DateTime dueDate = 0;
-      while (rdr.Read())
-      {
-        itemId = rdr.GetInt32(0);
-        itemDescription = rdr.GetString(1);
-        dueDate = rdr.GetDate(2);
-      }
-      Item foundItem = new Item(itemDescription, itemId, dueDate);
+
+      // DateTime dueDate = 0;
+      rdr.Read();
+      itemId = rdr.GetInt32(0);
+      itemDescription = rdr.GetString(1);
+      DateTime itemDueDate = rdr.GetDateTime(2);
+      Item foundItem = new Item(itemDescription, itemDueDate, itemId );
       conn.Close();
       if (conn != null)
       {
