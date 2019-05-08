@@ -22,9 +22,10 @@ namespace ToDoList.Controllers
     }
 
     [HttpPost("/categories")]
-    public ActionResult Create(string categoryName)
+    public ActionResult Create(string categoryDescription)
     {
-      Category newCategory = new Category(categoryName);
+      Category newCategory = new Category(categoryDescription);
+      newCategory.Save();
       List<Category> allCategories = Category.GetAll();
       return View("Index", allCategories);
     }
@@ -39,8 +40,8 @@ namespace ToDoList.Controllers
       model.Add("items", categoryItems);
       return View(model);
     }
-
-    // This one creates new Items within a given Category, not new Categories:
+    //
+    // // This one creates new Items within a given Category, not new Categories:
     [HttpPost("/categories/{categoryId}/items")]
     public ActionResult Create(int categoryId, string itemDescription, DateTime itemDueDate)
     {
