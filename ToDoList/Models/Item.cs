@@ -11,13 +11,13 @@ namespace ToDoList.Models
     private DateTime _dueDate;
     private int _categoryId;
 
-    public Item (string description, DateTime dueDate, int categoryId)
-    {
-      _description = description;
-      _dueDate = dueDate;
-      _categoryId = categoryId;
-    }
-    public Item (string description, DateTime dueDate, int categoryId, int id)
+    // public Item (string description, DateTime dueDate, int categoryId)
+    // {
+    //   _description = description;
+    //   _dueDate = dueDate;
+    //   _categoryId = categoryId;
+    // }
+    public Item (string description, DateTime dueDate, int categoryId, int id = 0)
     {
       _description = description;
       _dueDate = dueDate;
@@ -168,22 +168,26 @@ namespace ToDoList.Models
       MySqlConnection conn = DB.Connection();
       conn.Open();
       var cmd = conn.CreateCommand() as MySqlCommand;
-      cmd.CommandText = @"SELECT * FROM item WHERE id = @thisId;";
+      cmd.CommandText = @"SELECT * FROM item WHERE id = (@thisId);";
       MySqlParameter thisId = new MySqlParameter();
       thisId.ParameterName = "@thisId";
       thisId.Value = id;
       cmd.Parameters.Add(thisId);
-      var rdr = cmd.ExecuteReader() as MySqlDataReader;
+      MySqlDataReader rdr = cmd.ExecuteReader() as MySqlDataReader;
       int itemId = 0;
       string itemDescription = "";
+      DateTime itemDueDate = new DateTime(0001, 01, 01);
       int itemCategoryId = 0;
+      // Item foundItem = new Item(itemDescription, itemDueDate, itemCategoryId, itemId);
       // DateTime dueDate = 0;
-      rdr.Read();
-      itemId = rdr.GetInt32(0);
-      itemDescription = rdr.GetString(1);
-      DateTime itemDueDate = rdr.GetDateTime(2);
-      itemCategoryId = rdr.GetInt32(3);
-      Item foundItem = new Item(itemDescription, itemDueDate, itemCategoryId, itemId );
+      while(rdr.Read())
+      {
+        itemId = rdr.GetInt32(0);
+        itemDescription = rdr.GetString(1);
+        itemDueDate = rdr.GetDateTime(2);
+        itemCategoryId = rdr.GetInt32(3);
+      }
+      Item foundItem = new Item(itemDescription, itemDueDate, itemCategoryId, itemId);
       conn.Close();
       if (conn != null)
       {
