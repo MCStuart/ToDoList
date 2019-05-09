@@ -11,10 +11,11 @@ namespace ToDoList.Models
     private DateTime _dueDate;
     private int _categoryId;
 
-    public Item (string description, DateTime dueDate)
+    public Item (string description, DateTime dueDate, int categoryId)
     {
       _description = description;
       _dueDate = dueDate;
+      _categoryId = categoryId;
     }
     public Item (string description, DateTime dueDate, int categoryId, int id)
     {
@@ -49,9 +50,11 @@ namespace ToDoList.Models
       return _id;
     }
 
-    public int GetCategoryId()
+    public Category GetCategoryId()
     {
-      return _categoryId;
+      // int categId = Category.GetId();
+      //return _categoryId;
+      return Category.Find(_categoryId);
     }
 
     public override bool Equals(System.Object otherItem)
